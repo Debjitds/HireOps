@@ -4,6 +4,10 @@
 const MURF_API_KEY = import.meta.env.VITE_MURF_API_KEY || '';
 const MURF_API_URL = 'https://api.murf.ai/v1/speech/generate';
 
+// Global state to prevent overlapping audio
+let currentAudio: HTMLAudioElement | null = null;
+let currentFetchController: AbortController | null = null;
+
 // Default voice IDs - configurable per persona/language
 const DEFAULT_VOICES: Record<string, string> = {
   'English': 'en-US-natalie',
@@ -29,11 +33,15 @@ export async function speak(
   language: string = 'English',
   config: MurfConfig = {}
 ): Promise<void> {
+  // Stop any currently playing audio or pending fetch before starting a new one
+  stopSpeaking();
+
   const voiceId = config.voiceId || DEFAULT_VOICES[language] || DEFAULT_VOICES['English'];
 
   // First try Murf API
   if (MURF_API_KEY) {
     try {
+      currentFetchController = new AbortController();
       const response = await fetch(MURF_API_URL, {
         method: 'POST',
         headers: {
@@ -47,6 +55,7 @@ export async function speak(
           pitch: config.pitch || 0,
           format: 'MP3',
         }),
+        signal: currentFetchController.signal,
       });
 
       if (response.ok) {
@@ -55,8 +64,14 @@ export async function speak(
           return playAudioUrl(data.audioFile);
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        // Request was intentionally cancelled, do not fallback
+        return;
+      }
       console.warn('Murf API failed, falling back to browser TTS:', err);
+    } finally {
+      currentFetchController = null;
     }
   }
 
@@ -67,9 +82,20 @@ export async function speak(
 function playAudioUrl(url: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const audio = new Audio(url);
-    audio.onended = () => resolve();
-    audio.onerror = () => reject(new Error('Audio playback failed'));
-    audio.play().catch(reject);
+    currentAudio = audio;
+    
+    audio.onended = () => {
+      if (currentAudio === audio) currentAudio = null;
+      resolve();
+    };
+    audio.onerror = () => {
+      if (currentAudio === audio) currentAudio = null;
+      reject(new Error('Audio playback failed'));
+    };
+    audio.play().catch(err => {
+      if (currentAudio === audio) currentAudio = null;
+      reject(err);
+    });
   });
 }
 
@@ -111,6 +137,18 @@ function getLanguageCode(language: string): string {
 }
 
 export function stopSpeaking(): void {
+  // Abort any ongoing fetch request to Murf
+  if (currentFetchController) {
+    currentFetchController.abort();
+    currentFetchController = null;
+  }
+  // Stop and cleanup active HTMLAudioElement
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  // Stop browser fallback TTS
   if ('speechSynthesis' in window) {
     speechSynthesis.cancel();
   }

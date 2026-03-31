@@ -1,6 +1,7 @@
 <div align="center">
 
 # 🎙️ HireOps
+
 **The Voice-First Adaptive Interview Simulator**
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
@@ -9,7 +10,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=3ECF8E)](https://supabase.com/)
 
-*Practice seamlessly with intelligent AI avatars, receive instant spoken feedback, and walk into your next interview with confidence.*
+_Practice seamlessly with intelligent AI avatars, receive instant spoken feedback, and walk into your next interview with confidence._
 
 </div>
 
@@ -35,21 +36,21 @@
 
 ## ✨ Features
 
-| Feature | Description |
-|---|---|
-| 🎙️ **Voice-First Interaction** | Practice with natural-sounding AI voices via Murf Falcon. |
-| 🗣️ **Speech Recognition** | Answer naturally using your microphone (or fallback to typing). |
-| 🧠 **Adaptive AI Follow-ups** | Gemini-powered engine asks deeper questions if you give strong answers, and simpler ones if you struggle. |
-| 🌍 **Multilingual Modes** | Practice technical, HR, or situational interviews in the language of your choice. |
-| 🎭 **Custom Personas** | Face a "Strict Technical Interviewer", a "Friendly Coach", or an "HR Interviewer". |
-| 📊 **Actionable Feedback** | Get instant scores on Clarity, Structure, Technical Depth, Relevance, and Confidence. |
-| 📈 **Progress Tracking** | Monitor your overall progress and review transcripts from past sessions via the History Dashboard. |
+| Feature                        | Description                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| 🎙️ **Voice-First Interaction** | Practice with natural-sounding AI voices via Murf Falcon.                                                 |
+| 🗣️ **Speech Recognition**      | Answer naturally using your microphone (or fallback to typing).                                           |
+| 🧠 **Adaptive AI Follow-ups**  | Gemini-powered engine asks deeper questions if you give strong answers, and simpler ones if you struggle. |
+| 🌍 **Multilingual Modes**      | Practice technical, HR, or situational interviews in the language of your choice.                         |
+| 🎭 **Custom Personas**         | Face a "Strict Technical Interviewer", a "Friendly Coach", or an "HR Interviewer".                        |
+| 📊 **Actionable Feedback**     | Get instant scores on Clarity, Structure, Technical Depth, Relevance, and Confidence.                     |
+| 📈 **Progress Tracking**       | Monitor your overall progress and review transcripts from past sessions via the History Dashboard.        |
 
 ---
 
 ## ⚙️ How It Works
 
-The HireOps architecture is designed to recreate the fluidity of a real technical interview. 
+The HireOps architecture is designed to recreate the fluidity of a real technical interview.
 
 **`User Logs In (Supabase Auth)`** ➔ **`Configures Settings (Topic, Persona, Difficulty)`** ➔ <br/>
 **`Session Starts`** ➔ `Gemini generates context-aware question` ➔ `Murf renders spoken audio` ➔ <br/>
@@ -65,6 +66,7 @@ The HireOps architecture is designed to recreate the fluidity of a real technica
 HireOps is built for performance, rapid iteration, and premium dark-mode aesthetics (using cyan/violet glow accents).
 
 ### 🎨 Frontend
+
 - **Framework:** React 18 + Vite
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4 + shadcn/ui
@@ -72,16 +74,19 @@ HireOps is built for performance, rapid iteration, and premium dark-mode aesthet
 - **Routing:** React Router v6
 
 ### 🧠 AI & Voice Processing
-- **AI Brain (LLM):** Google Gemini 2.5 Flash 
+
+- **AI Brain (LLM):** Google Gemini 2.5 Flash
 - **Voice Output (TTS):** Murf Falcon API
 - **Voice Input (STT):** Browser Web Speech API
 
 ### 🧩 Backend & Database
+
 - **Platform:** Supabase
 - **Authentication:** Supabase Auth (Email Login/Signup)
 - **Database:** PostgreSQL (with Row Level Security)
 
 ### 🚀 Deployment
+
 - Vercel (Frontend)
 - Supabase (Backend/Auth)
 
@@ -112,6 +117,7 @@ hireops/
 To run the HireOps MVP locally on your machine:
 
 ### 1. Prerequisites
+
 - Node.js (v18+)
 - npm or pnpm
 - A Supabase Project (URL and Anon Key)
@@ -119,6 +125,7 @@ To run the HireOps MVP locally on your machine:
 - Murf AI API Key
 
 ### 2. Clone and Install
+
 ```bash
 git clone https://github.com/your-username/hireops.git
 cd hireops
@@ -126,6 +133,7 @@ npm install
 ```
 
 ### 3. Environment Variables
+
 Create a `.env` file in the root directory and populate it with your keys. **Note: Vite requires the `VITE_` prefix.**
 
 ```env
@@ -136,12 +144,15 @@ VITE_MURF_API_KEY=your_murf_api_key
 ```
 
 ### 4. Database Setup
+
 Ensure your Supabase project contains the required tables as defined in `Docs/database.md`. Set up Row Level Security (RLS) to enforce data privacy per user ID. Disable "Confirm Email" in the Supabase Auth settings to bypass email verification for testing purposes.
 
 ### 5. Run the Local Development Server
+
 ```bash
 npm run dev
 ```
+
 Open `http://localhost:5173` in your browser.
 
 ---
@@ -150,14 +161,14 @@ Open `http://localhost:5173` in your browser.
 
 HireOps features a cleanly separated multi-page SaaS structure:
 
-* **`/` Landing Page:** High-impact product overview and Call to Action.
-* **`/auth` Auth Area:** Seamless, combined Email Login/Signup card via Supabase.
-* **`/dashboard` Dashboard:** At-a-glance session stats and quick links.
-* **`/setup` Setup:** Detailed interview configuration (Role, Topic, Difficulty, Persona, Language, Custom Info).
-* **`/interview` Interview Room:** The live, interactive simulator with voice controls, text fallback, and real-time generation indicators.
-* **`/results` Results:** In-depth scorecards and improvement breakdown from your last completed session.
-* **`/history` History:** Past session logs and transcript reviews.
-* **`/account` Account:** Combined profile and preferences management.
+- **`/` Landing Page:** High-impact product overview and Call to Action.
+- **`/auth` Auth Area:** Seamless, combined Email Login/Signup card via Supabase.
+- **`/dashboard` Dashboard:** At-a-glance session stats and quick links.
+- **`/setup` Setup:** Detailed interview configuration (Role, Topic, Difficulty, Persona, Language, Custom Info).
+- **`/interview` Interview Room:** The live, interactive simulator with voice controls, text fallback, and real-time generation indicators.
+- **`/results` Results:** In-depth scorecards and improvement breakdown from your last completed session.
+- **`/history` History:** Past session logs and transcript reviews.
+- **`/account` Account:** Combined profile and preferences management.
 
 ---
 
@@ -182,7 +193,7 @@ HireOps does not use chaotic, random LLM outputs. It relies on a **Deterministic
 2. **Adaptive Logic:** If a user scores an 8+, the controller prompts Gemini to ask a complex edge-case question next. If a user scores a 4, the controller prompts Gemini to clarify foundational concepts.
 3. **Structured Prompts:** Gemini is fed strict SYSTEM rules and context buffers, forcing structured JSON evaluation outputs (Clarity, Structure, Technical Depth) instead of unpredictable conversational text.
 
-*Note: The engine strictly processes and stores text transcripts. No raw audio data is persisted, significantly reducing storage costs and preserving privacy.*
+_Note: The engine strictly processes and stores text transcripts. No raw audio data is persisted, significantly reducing storage costs and preserving privacy._
 
 ---
 
@@ -195,14 +206,14 @@ HireOps does not use chaotic, random LLM outputs. It relies on a **Deterministic
 
 ## 📸 Screenshots
 
-*(Replace placeholders with actual image URLs of your deployed application)*
+_(Replace placeholders with actual image URLs of your deployed application)_
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x450/0f172a/38bdf8?text=Landing+Page+Preview" alt="HireOps Landing Page"/>
+  <img src="public/landingpage.png" alt="HireOps Landing Page"/>
   <br/><br/>
-  <img src="https://via.placeholder.com/800x450/0f172a/38bdf8?text=Dashboard+Overview" alt="HireOps Dashboard Overview" width="48%"/>
+  <img src="public/dashboard.png" alt="HireOps Dashboard Overview" width="48%"/>
   &nbsp;
-  <img src="https://via.placeholder.com/800x450/0f172a/38bdf8?text=Interview+Room+Session" alt="HireOps Live Interview Flow" width="48%"/>
+  <img src="public/interviewflow.png" alt="HireOps Live Interview Flow" width="48%"/>
 </div>
 
 ---

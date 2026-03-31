@@ -63,7 +63,7 @@ type InterviewPhase = 'loading' | 'ready' | 'generating' | 'speaking' | 'listeni
 export default function Interview() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
 
   const [session, setSession] = useState<SessionData | null>(null);
   const [phase, setPhase] = useState<InterviewPhase>('loading');
@@ -103,6 +103,7 @@ export default function Interview() {
       .then(data => {
         setSession(data as SessionData);
         setPhase('ready');
+        startTimeRef.current = Date.now();
         logSessionEvent(sessionId, 'session_started');
       })
       .catch(() => {
@@ -110,14 +111,6 @@ export default function Interview() {
         setPhase('loading');
       });
   }, [sessionId]);
-
-  // Auto-start first question
-  useEffect(() => {
-    if (phase === 'ready' && session) {
-      generateNextQuestion();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, session]);
 
   const generateNextQuestion = useCallback(async () => {
     if (!session || !sessionId) return;
@@ -182,6 +175,14 @@ export default function Interview() {
       setPhase('listening');
     }
   }, [session, sessionId, questionNumber, storedAnswers, resetSpeech]);
+
+  // Auto-start new questions when phase becomes 'ready'
+  useEffect(() => {
+    if (phase === 'ready' && session) {
+      const timer = setTimeout(() => generateNextQuestion(), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [phase, session, generateNextQuestion]);
 
   const handleSubmitAnswer = useCallback(async () => {
     const answerText = useTextMode ? manualInput.trim() : transcript.trim();
@@ -307,13 +308,7 @@ export default function Interview() {
     setPhase('ready');
   }, [questionNumber, endInterview]);
 
-  // Trigger question generation when phase becomes 'ready' and questionNumber changes
-  useEffect(() => {
-    if (phase === 'ready' && session && questionNumber > 1) {
-      generateNextQuestion();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questionNumber]);
+
 
   // endInterview is now defined above handleNextQuestion as a useCallback
 
