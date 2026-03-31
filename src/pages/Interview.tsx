@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 import { useSpeech } from '@/hooks/useSpeech';
 import {
   getSession,
@@ -64,7 +63,7 @@ type InterviewPhase = 'loading' | 'ready' | 'generating' | 'speaking' | 'listeni
 export default function Interview() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const { user: _user } = useAuth();
+  const startTimeRef = useRef<number>(Date.now());
 
   const [session, setSession] = useState<SessionData | null>(null);
   const [phase, setPhase] = useState<InterviewPhase>('loading');
@@ -253,25 +252,7 @@ export default function Interview() {
     currentQuestion, isRecording, stopRecording, questionNumber, storedAnswers,
   ]);
 
-  const handleNextQuestion = useCallback(async () => {
-    if (questionNumber >= MAX_QUESTIONS) {
-      // End interview
-      await endInterview();
-      return;
-    }
-    setQuestionNumber(prev => prev + 1);
-    setPhase('ready');
-  }, [questionNumber]);
-
-  // Trigger question generation when phase becomes 'ready' and questionNumber changes
-  useEffect(() => {
-    if (phase === 'ready' && session && questionNumber > 1) {
-      generateNextQuestion();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questionNumber]);
-
-  const endInterview = async () => {
+  const endInterview = useCallback(async () => {
     if (!sessionId || !session) return;
     setPhase('generating');
 
@@ -291,11 +272,13 @@ export default function Interview() {
         language: session.language,
       });
 
+      const durationSeconds = Math.round((Date.now() - startTimeRef.current) / 1000);
+
       await updateSession(sessionId, {
         status: 'completed',
         overall_score: summary.overall_score,
         ended_at: new Date().toISOString(),
-        duration_seconds: Math.round((Date.now() - new Date(session.id).getTime()) / 1000) || 0,
+        duration_seconds: durationSeconds,
       });
 
       await logSessionEvent(sessionId, 'session_completed');
@@ -313,7 +296,26 @@ export default function Interview() {
       await updateSession(sessionId, { status: 'completed' });
       setPhase('complete');
     }
-  };
+  }, [sessionId, session, storedAnswers]);
+
+  const handleNextQuestion = useCallback(async () => {
+    if (questionNumber >= MAX_QUESTIONS) {
+      await endInterview();
+      return;
+    }
+    setQuestionNumber(prev => prev + 1);
+    setPhase('ready');
+  }, [questionNumber, endInterview]);
+
+  // Trigger question generation when phase becomes 'ready' and questionNumber changes
+  useEffect(() => {
+    if (phase === 'ready' && session && questionNumber > 1) {
+      generateNextQuestion();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questionNumber]);
+
+  // endInterview is now defined above handleNextQuestion as a useCallback
 
   const progress = (questionNumber / MAX_QUESTIONS) * 100;
   const currentAnswer = useTextMode ? manualInput : transcript;

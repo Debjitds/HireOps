@@ -1,7 +1,7 @@
 // Murf Falcon API client for voice output
 // Streams TTS audio and plays in the browser
 
-const MURF_API_KEY = import.meta.env.MURF_API_KEY || '';
+const MURF_API_KEY = import.meta.env.VITE_MURF_API_KEY || '';
 const MURF_API_URL = 'https://api.murf.ai/v1/speech/generate';
 
 // Default voice IDs - configurable per persona/language
